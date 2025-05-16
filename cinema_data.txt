@@ -1,0 +1,16 @@
+Cinema:Cineplex Downtown | 123 Main St | 555-0101
+Movie:The Great Adventure | Steven Spielberg | Tom Hanks, Emma Watson, John Doe | Adventure | PG-13 | 10:00, 13:30, 18:00, 21:15 | 12.5 | 8.5 | 9.5 | 15.0
+Movie:Space Odyssey | Ridley Scott | Jennifer Lawrence, Chris Pratt, Morgan Freeman | Sci-Fi | PG-13 | 11:00, 14:30, 19:00, 22:15 | 13.5 | 9.0 | 10.0 | 16.0
+Movie:Toy Adventures | Animation Director | Voice Actor 1, Voice Actor 2, Voice Actor 3 | Animation | G | 09:30, 12:00, 15:30 | 10.5 | 7.5 | 8.5 | 12.0
+Movie:The Movie 2 | James Cespedes | Bannie, Elmo | Gnero Binario | +18 | 10:00, 12:00, 15:00, 20:00 | 10.5 | 8.2 | 5.0 | 25.0
+Cinema:Starlight Theater | 456 Elm Ave | 555-0202
+Movie:Superheroes United | Joss Whedon | Robert Downey Jr., Scarlett Johansson, Mark Ruffalo | Action | PG-13 | 10:30, 14:00, 17:30, 21:00 | 14.0 | 9.5 | 10.5 | 17.0
+Movie:The Magic Forest | Animation Director 2 | Voice Actor 4, Voice Actor 5 | Animated | PG | 10:00, 13:00, 16:00 | 11.0 | 8.0 | 9.0 | 13.0
+Movie:Ocean Mystery | James Cameron | Leonardo DiCaprio, Kate Winslet | Thriller | R | 19:30, 22:45 | 12.0 | 8.0 | 9.0 | 14.0
+Cinema:Royal Cinemas | 789 Oak Blvd | 555-0303
+Movie:Romantic Nights | Nancy Meyers | Julia Roberts, George Clooney, Meryl Streep | Romance | PG-13 | 12:00, 15:00, 18:30, 21:30 | 11.5 | 7.5 | 8.5 | 14.0
+Movie:Jurassic Safari | Colin Trevorrow | Chris Pratt, Bryce Dallas Howard | Adventure | PG-13 | 10:15, 13:45, 17:15, 20:45 | 14.5 | 9.5 | 10.5 | 17.5
+Movie:Robot Dreams | Animation Director 3 | Voice Actor 6, Voice Actor 7 | Animation | PG | 10:30, 13:30, 16:30 | 10.0 | 7.0 | 8.0 | 12.0
+Cinema:Cinecolombia | Carrera 1 No 1 - 1 | 123456789
+Movie:Pelicula Prueba | Prueba | Prueba 1 |  | Prueba 1 | 12:00 | 1.0 | 2.0 | 3.0 | 4.0
+Cinema:*** | *** | ***
