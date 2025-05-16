@@ -6,6 +6,7 @@ import Modelo.MovieSchedule;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import javax.swing.table.TableModel;
 
 public class CinemaController {
     private List<Cinema> cinemas;
@@ -179,5 +180,9 @@ public class CinemaController {
                 }
             }
         }
+    }
+
+    public TableModel getTableModel() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

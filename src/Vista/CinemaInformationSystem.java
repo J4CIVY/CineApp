@@ -8,8 +8,6 @@ import Modelo.Pricing;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +19,10 @@ public class CinemaInformationSystem extends JFrame {
     private DefaultTableModel tableModel;
     private CinemaController controller;
 
+    // Campos para el inicio de sesión
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+
     public CinemaInformationSystem() {
         cinemas = new ArrayList<>();
         loadDataFromFile();
@@ -30,8 +32,111 @@ public class CinemaInformationSystem extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        createUI();
-        controller = new CinemaController(cinemas, tableModel);
+        createLoginPanel(); // Crear panel de inicio de sesión
+    }
+
+    private void createLoginPanel() {
+        JPanel loginPanel = new JPanel(new GridLayout(3, 2));
+        loginPanel.setBorder(BorderFactory.createTitledBorder("Inicio de Sesión"));
+
+        usernameField = new JTextField();
+        passwordField = new JPasswordField();
+
+        JButton loginButton = new JButton("Iniciar Sesión");
+        loginButton.addActionListener(e -> validateLogin());
+
+        loginPanel.add(new JLabel("Usuario:"));
+        loginPanel.add(usernameField);
+        loginPanel.add(new JLabel("Contraseña:"));
+        loginPanel.add(passwordField);
+        loginPanel.add(loginButton);
+
+        add(loginPanel);
+        revalidate(); // Actualizar la interfaz
+        repaint(); // Redibujar la interfaz
+    }
+
+    private void validateLogin() {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+
+        // Validar credenciales
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Aquí se pueden agregar credenciales válidas
+        if (username.equals("admin") && password.equals("1234")) {
+            removeLoginPanel(); // Eliminar el panel de inicio de sesión
+            showCaseDescription(); // Mostrar la descripción del caso
+        } else {
+            JOptionPane.showMessageDialog(this, "Credenciales incorrectas. Intente de nuevo.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void removeLoginPanel() {
+        // Eliminar el panel de inicio de sesión
+        for (Component comp : getContentPane().getComponents()) {
+            remove(comp);
+        }
+    }
+
+    private void showCaseDescription() {
+        // Crear un nuevo panel para mostrar la descripción del caso
+        JPanel caseDescriptionPanel = new JPanel(new BorderLayout());
+        JTextArea descriptionArea = new JTextArea();
+        descriptionArea.setText("La asociación de cines de una ciudad quiere crear un servicio telefónico\n" +
+                "en el que se pueda hacer cualquier tipo de consulta sobre las películas\n" +
+                "que se están proyectando actualmente: en qué cines hacen una\n" +
+                "determinada película y el horario de los pases, qué películas de dibujos\n" +
+                "animados se están proyectando y dónde, qué películas hay en un\n" +
+                "determinado cine, etc. Para ello debemos diseñar una base de datos\n" +
+                "relacional que contenga toda esta información.\n" +
+                "En concreto, para cada cine se debe dar el título de la película y el\n" +
+                "horario de los pases, además del nombre del director de la misma, el\n" +
+                "nombre de hasta tres de sus protagonistas, el género (comedia, intriga,\n" +
+                "etc.) y la clasificación (tolerada menores, mayores de 18 años, etc.).\n" +
+                "La base de datos también almacenará la calle y número donde está el cine,\n" +
+                "el teléfono y los distintos precios según el día (día del espectador,\n" +
+                "día del jubilado, festivos y vísperas, carnet de estudiante, etc.).");
+        descriptionArea.setEditable(false);
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setWrapStyleWord(true);
+        caseDescriptionPanel.add(new JScrollPane(descriptionArea), BorderLayout.CENTER);
+
+        JButton nextButton = new JButton("Siguiente");
+        nextButton.addActionListener(e -> {
+            remove(caseDescriptionPanel); // Eliminar el panel de descripción
+            showDeveloperInfo(); // Mostrar la información del desarrollador
+        });
+        caseDescriptionPanel.add(nextButton, BorderLayout.SOUTH);
+
+        add(caseDescriptionPanel);
+        revalidate(); // Actualizar la interfaz
+        repaint(); // Redibujar la interfaz
+    }
+
+    private void showDeveloperInfo() {
+        // Crear un nuevo panel para mostrar la información del desarrollador
+        JPanel developerInfoPanel = new JPanel(new GridLayout(0, 1));
+        developerInfoPanel.setBorder(BorderFactory.createTitledBorder("Información del Desarrollador"));
+
+        developerInfoPanel.add(new JLabel("Nombre del Desarrollador: Juan Pérez"));
+        developerInfoPanel.add(new JLabel("Asignatura: Desarrollo de Software"));
+        developerInfoPanel.add(new JLabel("Institución: Universidad Ejemplo"));
+        developerInfoPanel.add(new JLabel("Periodo Académico: 2023-2"));
+
+        JButton startAppButton = new JButton("Iniciar Aplicación");
+        startAppButton.addActionListener(e -> {
+            remove(developerInfoPanel); // Eliminar el panel de información del desarrollador
+            createUI(); // Crear la interfaz principal de la aplicación
+        });
+        developerInfoPanel.add(startAppButton);
+
+        add(developerInfoPanel);
+        revalidate(); // Actualizar la interfaz
+        repaint(); // Redibujar la interfaz
     }
 
     private void createUI() {
@@ -98,6 +203,9 @@ public class CinemaInformationSystem extends JFrame {
         exitButton.addActionListener(e -> System.exit(0));
 
         add(mainPanel);
+        controller = new CinemaController(cinemas, tableModel);
+        revalidate(); // Actualizar la interfaz
+        repaint(); // Redibujar la interfaz
     }
 
     private void openAddCinemaDialog() {
@@ -144,93 +252,92 @@ public class CinemaInformationSystem extends JFrame {
     }
 
     private void openAddMovieDialog() {
-    // Crear un diálogo para agregar una nueva película
-    JDialog dialog = new JDialog(this, "Agregar Película", true);
-    dialog.setLayout(new GridLayout(0, 2));
+        // Crear un diálogo para agregar una nueva película
+        JDialog dialog = new JDialog(this, "Agregar Película", true);
+        dialog.setLayout(new GridLayout(0, 2));
 
-    // Campos para ingresar datos
-    JTextField titleField = new JTextField();
-    JTextField directorField = new JTextField();
-    JTextField actorsField = new JTextField();
-    JTextField genreField = new JTextField();
-    JTextField ratingField = new JTextField();
-    JTextField showTimesField = new JTextField();
-    JTextField standardPriceField = new JTextField();
-    JTextField seniorPriceField = new JTextField();
-    JTextField studentPriceField = new JTextField();
-    JTextField holidayPriceField = new JTextField();
+        // Campos para ingresar datos
+        JTextField titleField = new JTextField();
+        JTextField directorField = new JTextField();
+        JTextField actorsField = new JTextField();
+        JTextField genreField = new JTextField();
+        JTextField ratingField = new JTextField();
+        JTextField showTimesField = new JTextField();
+        JTextField standardPriceField = new JTextField();
+        JTextField seniorPriceField = new JTextField();
+        JTextField studentPriceField = new JTextField();
+        JTextField holidayPriceField = new JTextField();
 
-    // JComboBox para seleccionar el cine
-    JComboBox<Cinema> cinemaComboBox = new JComboBox<>();
-    for (Cinema cinema : cinemas) {
-        cinemaComboBox.addItem(cinema);
-    }
-
-    dialog.add(new JLabel("Seleccionar Cine:"));
-    dialog.add(cinemaComboBox);
-    dialog.add(new JLabel("Título de la Película:"));
-    dialog.add(titleField);
-    dialog.add(new JLabel("Director:"));
-    dialog.add(directorField);
-    dialog.add(new JLabel("Actores (separados por comas):"));
-    dialog.add(actorsField);
-    dialog.add(new JLabel("Género:"));
-    dialog.add(genreField);
-    dialog.add(new JLabel("Clasificación:"));
-    dialog.add(ratingField);
-    dialog.add(new JLabel("Horarios (separados por comas):"));
-    dialog.add(showTimesField);
-    dialog.add(new JLabel("Precio Estándar:"));
-    dialog.add(standardPriceField);
-    dialog.add(new JLabel("Precio Adulto Mayor:"));
-    dialog.add(seniorPriceField);
-    dialog.add(new JLabel("Precio Estudiante:"));
-    dialog.add(studentPriceField);
-    dialog.add(new JLabel("Precio Festivo:"));
-    dialog.add(holidayPriceField);
-
-    JButton addButton = new JButton("Agregar");
-    addButton.addActionListener(e -> {
-        // Lógica para agregar la película
-        String title = titleField.getText();
-        String director = directorField.getText();
-        String[] actors = actorsField.getText().split(",");
-        String genre = genreField.getText();
-        String rating = ratingField.getText();
-        String[] showTimes = showTimesField.getText().split(",");
-        double standardPrice = Double.parseDouble(standardPriceField.getText());
-        double seniorPrice = Double.parseDouble(seniorPriceField.getText());
-        double studentPrice = Double.parseDouble(studentPriceField.getText());
-        double holidayPrice = Double.parseDouble(holidayPriceField.getText());
-
-        // Obtener el cine seleccionado
-        Cinema selectedCinema = (Cinema) cinemaComboBox.getSelectedItem();
-
-        // Crear objeto Movie y agregar a la lista del cine correspondiente
-        Movie newMovie = new Movie(title, director, List.of(actors), genre, rating);
-        Pricing pricing = new Pricing(standardPrice, seniorPrice, studentPrice, holidayPrice);
-        MovieSchedule newSchedule = new MovieSchedule(newMovie, List.of(showTimes), pricing);
-
-        // Agregar la película al cine seleccionado
-        if (selectedCinema != null) {
-            selectedCinema.addSchedule(newSchedule);
+        // JComboBox para seleccionar el cine
+        JComboBox<Cinema> cinemaComboBox = new JComboBox<>();
+        for (Cinema cinema : cinemas) {
+            cinemaComboBox.addItem(cinema);
         }
 
-        // Actualizar la tabla
-        controller.showAllCinemas();
+        dialog.add(new JLabel("Seleccionar Cine:"));
+        dialog.add(cinemaComboBox);
+        dialog.add(new JLabel("Título de la Película:"));
+        dialog.add(titleField);
+        dialog.add(new JLabel("Director:"));
+        dialog.add(directorField);
+        dialog.add(new JLabel("Actores (separados por comas):"));
+        dialog.add(actorsField);
+        dialog.add(new JLabel("Género:"));
+        dialog.add(genreField);
+        dialog.add(new JLabel("Clasificación:"));
+        dialog.add(ratingField);
+        dialog.add(new JLabel("Horarios (separados por comas):"));
+        dialog.add(showTimesField);
+        dialog.add(new JLabel("Precio Estándar:"));
+        dialog.add(standardPriceField);
+        dialog.add(new JLabel("Precio Adulto Mayor:"));
+        dialog.add(seniorPriceField);
+        dialog.add(new JLabel("Precio Estudiante:"));
+        dialog.add(studentPriceField);
+        dialog.add(new JLabel("Precio Festivo:"));
+        dialog.add(holidayPriceField);
 
-        // Guardar la nueva película en el archivo
-        saveDataToFile();
+        JButton addButton = new JButton("Agregar");
+        addButton.addActionListener(e -> {
+            // Lógica para agregar la película
+            String title = titleField.getText();
+            String director = directorField.getText();
+            String[] actors = actorsField.getText().split(",");
+            String genre = genreField.getText();
+            String rating = ratingField.getText();
+            String[] showTimes = showTimesField.getText().split(",");
+            double standardPrice = Double.parseDouble(standardPriceField.getText());
+            double seniorPrice = Double.parseDouble(seniorPriceField.getText());
+            double studentPrice = Double.parseDouble(studentPriceField.getText());
+            double holidayPrice = Double.parseDouble(holidayPriceField.getText());
 
-        dialog.dispose(); // Cerrar el diálogo
-    });
+            // Obtener el cine seleccionado
+            Cinema selectedCinema = (Cinema) cinemaComboBox.getSelectedItem();
 
-    dialog.add(addButton);
-    dialog.pack();
-    dialog.setLocationRelativeTo(this);
-    dialog.setVisible(true);
-}
+            // Crear objeto Movie y agregar a la lista del cine correspondiente
+            Movie newMovie = new Movie(title, director, List.of(actors), genre, rating);
+            Pricing pricing = new Pricing(standardPrice, seniorPrice, studentPrice, holidayPrice);
+            MovieSchedule newSchedule = new MovieSchedule(newMovie, List.of(showTimes), pricing);
 
+            // Agregar la película al cine seleccionado
+            if (selectedCinema != null) {
+                selectedCinema.addSchedule(newSchedule);
+            }
+
+            // Actualizar la tabla
+            controller.showAllCinemas();
+
+            // Guardar la nueva película en el archivo
+            saveDataToFile();
+
+            dialog.dispose(); // Cerrar el diálogo
+        });
+
+        dialog.add(addButton);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
 
     private void loadDataFromFile() {
         File file = new File("cinema_data.txt");

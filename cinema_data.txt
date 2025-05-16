@@ -14,3 +14,4 @@ Movie:Robot Dreams | Animation Director 3 | Voice Actor 6, Voice Actor 7 | Anima
 Cinema:Cinecolombia | Carrera 1 No 1 - 1 | 123456789
 Movie:Pelicula Prueba | Prueba | Prueba 1 |  | Prueba 1 | 12:00 | 1.0 | 2.0 | 3.0 | 4.0
 Cinema:*** | *** | ***
+Cinema:Cineprueba2 | gfgfgf | fgfgf
