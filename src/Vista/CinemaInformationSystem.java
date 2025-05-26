@@ -11,15 +11,16 @@ import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultCaret;
 
-// Clase principal de la aplicación con GUI
 public class CinemaInformationSystem extends JFrame {
+
     private List<Cinema> cinemas;
     private JTable resultTable;
     private DefaultTableModel tableModel;
     private CinemaController controller;
 
-    // Campos para el inicio de sesión
     private JTextField usernameField;
     private JPasswordField passwordField;
 
@@ -36,37 +37,113 @@ public class CinemaInformationSystem extends JFrame {
     }
 
     private void createLoginPanel() {
-        JPanel loginPanel = new JPanel(new GridLayout(3, 2));
-        loginPanel.setBorder(BorderFactory.createTitledBorder("Inicio de Sesión"));
+        JPanel loginMainPanel = new JPanel(new BorderLayout(10, 10));
+        loginMainPanel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
+        loginMainPanel.setBackground(new Color(240, 240, 240));
 
-        usernameField = new JTextField();
-        passwordField = new JPasswordField();
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        logoPanel.setBackground(new Color(240, 240, 240));
+        try {
+            ImageIcon logoIcon = new ImageIcon("logo_universidad.png");
+            Image scaledImage = logoIcon.getImage().getScaledInstance(200, -1, Image.SCALE_SMOOTH);
+            JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
+            logoPanel.add(logoLabel);
 
+            logoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
+        } catch (Exception e) {
+            JLabel placeholder = new JLabel("UNIVERSIDAD XYZ");
+            placeholder.setFont(new Font("Arial", Font.BOLD, 20));
+            placeholder.setForeground(new Color(70, 130, 180));
+            logoPanel.add(placeholder);
+        }
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(new Color(70, 130, 180)),
+                        " INICIAR SESIÓN ",
+                        TitledBorder.CENTER,
+                        TitledBorder.TOP,
+                        new Font("Arial", Font.BOLD, 14),
+                        new Color(70, 130, 180)
+                ),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+        formPanel.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
+        JLabel userLabel = new JLabel("Usuario:");
+        userLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        formPanel.add(userLabel, gbc);
+
+        gbc.gridy++;
+        usernameField = new JTextField(20);
+        usernameField.setFont(new Font("Arial", Font.PLAIN, 14));
+        usernameField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
+        formPanel.add(usernameField, gbc);
+
+        gbc.gridy++;
+        JLabel passLabel = new JLabel("Contraseña:");
+        passLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        formPanel.add(passLabel, gbc);
+
+        gbc.gridy++;
+        passwordField = new JPasswordField(20);
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
+        passwordField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
+        formPanel.add(passwordField, gbc);
+
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.CENTER;
         JButton loginButton = new JButton("Iniciar Sesión");
+        loginButton.setFont(new Font("Arial", Font.BOLD, 14));
+        loginButton.setBackground(new Color(70, 130, 180));
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setFocusPainted(false);
+        loginButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createRaisedBevelBorder(),
+                BorderFactory.createEmptyBorder(8, 25, 8, 25)
+        ));
         loginButton.addActionListener(e -> validateLogin());
+        loginButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                loginButton.setBackground(new Color(60, 110, 160));
+            }
 
-        loginPanel.add(new JLabel("Usuario:"));
-        loginPanel.add(usernameField);
-        loginPanel.add(new JLabel("Contraseña:"));
-        loginPanel.add(passwordField);
-        loginPanel.add(loginButton);
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                loginButton.setBackground(new Color(70, 130, 180));
+            }
+        });
+        formPanel.add(loginButton, gbc);
 
-        add(loginPanel);
-        revalidate(); // Actualizar la interfaz
-        repaint(); // Redibujar la interfaz
+        loginMainPanel.add(logoPanel, BorderLayout.NORTH);
+        loginMainPanel.add(formPanel, BorderLayout.CENTER);
+
+        add(loginMainPanel);
+        revalidate();
+        repaint();
     }
 
     private void validateLogin() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
 
-        // Validar credenciales
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Aquí se pueden agregar credenciales válidas
         if (username.equals("admin") && password.equals("1234")) {
             removeLoginPanel(); // Eliminar el panel de inicio de sesión
             showCaseDescription(); // Mostrar la descripción del caso
@@ -76,86 +153,208 @@ public class CinemaInformationSystem extends JFrame {
     }
 
     private void removeLoginPanel() {
-        // Eliminar el panel de inicio de sesión
         for (Component comp : getContentPane().getComponents()) {
             remove(comp);
         }
     }
 
     private void showCaseDescription() {
-        // Crear un nuevo panel para mostrar la descripción del caso
-        JPanel caseDescriptionPanel = new JPanel(new BorderLayout());
+        JPanel caseDescriptionPanel = new JPanel(new BorderLayout(10, 10));
+        caseDescriptionPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        caseDescriptionPanel.setBackground(new Color(240, 240, 240));
+
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(new Color(70, 130, 180)); // Color azul acero
+        JLabel titleLabel = new JLabel("SISTEMA DE GESTIÓN DE CINES", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        titlePanel.add(titleLabel);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        infoPanel.setBackground(Color.WHITE);
+
+        JLabel projectInfo = new JLabel("<html><div style='text-align:center;'><b>PROYECTO DESARROLLADO POR:</b><br>"
+                + "James Andres Cespedes Ibarra<br><br>"
+                + "Juan Sebastian Miranda Mejia<br><br>"
+                + "<b>PARA LA ASIGNATURA:</b><br>"
+                + "Tecnicas De Programacion II<br><br>"
+                + "<b>VERSIÓN:</b> 1.0.0</div></html>");
+        projectInfo.setFont(new Font("Arial", Font.PLAIN, 14));
+        projectInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        infoPanel.add(projectInfo);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Espacio
+
+        // Área de texto con descripción
         JTextArea descriptionArea = new JTextArea();
-        descriptionArea.setText("La asociación de cines de una ciudad quiere crear un servicio telefónico\n" +
-                "en el que se pueda hacer cualquier tipo de consulta sobre las películas\n" +
-                "que se están proyectando actualmente: en qué cines hacen una\n" +
-                "determinada película y el horario de los pases, qué películas de dibujos\n" +
-                "animados se están proyectando y dónde, qué películas hay en un\n" +
-                "determinado cine, etc. Para ello debemos diseñar una base de datos\n" +
-                "relacional que contenga toda esta información.\n" +
-                "En concreto, para cada cine se debe dar el título de la película y el\n" +
-                "horario de los pases, además del nombre del director de la misma, el\n" +
-                "nombre de hasta tres de sus protagonistas, el género (comedia, intriga,\n" +
-                "etc.) y la clasificación (tolerada menores, mayores de 18 años, etc.).\n" +
-                "La base de datos también almacenará la calle y número donde está el cine,\n" +
-                "el teléfono y los distintos precios según el día (día del espectador,\n" +
-                "día del jubilado, festivos y vísperas, carnet de estudiante, etc.).");
+        descriptionArea.setText("DESCRIPCIÓN DEL PROYECTO:\n\n"
+                + "La asociación de cines de una ciudad requiere un sistema para gestionar información\n"
+                + "sobre las películas que se proyectan actualmente. El sistema permitirá:\n\n"
+                + "• Consultar en qué cines se proyecta una película específica y sus horarios\n"
+                + "• Buscar películas animadas disponibles\n"
+                + "• Ver la cartelera completa de un cine específico\n"
+                + "• Filtrar películas por género o clasificación\n\n"
+                + "CARACTERÍSTICAS TÉCNICAS:\n\n"
+                + "• Base de datos relacional para almacenar toda la información\n"
+                + "• Interfaz gráfica intuitiva para administradores\n"
+                + "• Sistema de autenticación seguro\n"
+                + "• Persistencia de datos en archivo local");
         descriptionArea.setEditable(false);
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
-        caseDescriptionPanel.add(new JScrollPane(descriptionArea), BorderLayout.CENTER);
+        descriptionArea.setFont(new Font("Arial", Font.PLAIN, 14));
+        descriptionArea.setBackground(Color.WHITE);
 
-        JButton nextButton = new JButton("Siguiente");
+        descriptionArea.setMargin(new Insets(10, 50, 10, 50));
+        ((DefaultCaret) descriptionArea.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+
+        JScrollPane scrollPane = new JScrollPane(descriptionArea);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        infoPanel.add(scrollPane);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(240, 240, 240));
+        JButton nextButton = new JButton("Continuar");
+        nextButton.setFont(new Font("Arial", Font.BOLD, 14));
+        nextButton.setBackground(new Color(70, 130, 180));
+        nextButton.setForeground(Color.WHITE);
+        nextButton.setFocusPainted(false);
+        nextButton.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
         nextButton.addActionListener(e -> {
-            remove(caseDescriptionPanel); // Eliminar el panel de descripción
-            showDeveloperInfo(); // Mostrar la información del desarrollador
+            remove(caseDescriptionPanel);
+            showDeveloperInfo();
         });
-        caseDescriptionPanel.add(nextButton, BorderLayout.SOUTH);
+        buttonPanel.add(nextButton);
+
+        caseDescriptionPanel.add(titlePanel, BorderLayout.NORTH);
+        caseDescriptionPanel.add(infoPanel, BorderLayout.CENTER);
+        caseDescriptionPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(caseDescriptionPanel);
-        revalidate(); // Actualizar la interfaz
-        repaint(); // Redibujar la interfaz
+        revalidate();
+        repaint();
     }
 
     private void showDeveloperInfo() {
-        // Crear un nuevo panel para mostrar la información del desarrollador
-        JPanel developerInfoPanel = new JPanel(new GridLayout(0, 1));
-        developerInfoPanel.setBorder(BorderFactory.createTitledBorder("Información del Desarrollador"));
+        JPanel developerInfoPanel = new JPanel(new BorderLayout(10, 10));
+        developerInfoPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+        developerInfoPanel.setBackground(new Color(240, 240, 240));
 
-        developerInfoPanel.add(new JLabel("Nombre del Desarrollador: Juan Pérez"));
-        developerInfoPanel.add(new JLabel("Asignatura: Desarrollo de Software"));
-        developerInfoPanel.add(new JLabel("Institución: Universidad Ejemplo"));
-        developerInfoPanel.add(new JLabel("Periodo Académico: 2023-2"));
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        logoPanel.setBackground(new Color(240, 240, 240));
+        try {
+            ImageIcon logoIcon = new ImageIcon("logo_universidad.png");
+            Image scaledImage = logoIcon.getImage().getScaledInstance(180, -1, Image.SCALE_SMOOTH);
+            JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
+            logoPanel.add(logoLabel);
+            logoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        } catch (Exception e) {
+            JLabel logoPlaceholder = new JLabel("KONRAD LORENZ");
+            logoPlaceholder.setFont(new Font("Arial", Font.BOLD, 18));
+            logoPlaceholder.setForeground(new Color(0, 76, 153)); // Azul institucional
+            logoPanel.add(logoPlaceholder);
+        }
+
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        infoPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(new Color(0, 76, 153)),
+                        " INFORMACIÓN DEL EQUIPO ",
+                        TitledBorder.CENTER,
+                        TitledBorder.TOP,
+                        new Font("Arial", Font.BOLD, 14),
+                        new Color(0, 76, 153)
+                ),
+                BorderFactory.createEmptyBorder(20, 30, 20, 30)
+        ));
+        infoPanel.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
+        addInfoLine(infoPanel, gbc, "Desarollador 1 - James Andres Cespedes Ibarra");
+        gbc.gridy++;
+        addInfoLine(infoPanel, gbc, "Desarollador 2 - Juan Sebastian Miranda Mejia");
+        gbc.gridy++;
+        addInfoLine(infoPanel, gbc, " ");
+        gbc.gridy++;
+        addInfoLine(infoPanel, gbc, "Materia - Técnicas de Programación II");
+        gbc.gridy++;
+        addInfoLine(infoPanel, gbc, " ");
+        gbc.gridy++;
+        addInfoLine(infoPanel, gbc, "Fundación Universitaria Konrad Lorenz");
+        gbc.gridy++;
+        addInfoLine(infoPanel, gbc, " ");
+        gbc.gridy++;
+        addInfoLine(infoPanel, gbc, " Periodo Academico - 2025-1");
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(new Color(240, 240, 240));
 
         JButton startAppButton = new JButton("Iniciar Aplicación");
-        startAppButton.addActionListener(e -> {
-            remove(developerInfoPanel); // Eliminar el panel de información del desarrollador
-            createUI(); // Crear la interfaz principal de la aplicación
+        startAppButton.setFont(new Font("Arial", Font.BOLD, 14));
+        startAppButton.setBackground(new Color(0, 76, 153));
+        startAppButton.setForeground(Color.WHITE);
+        startAppButton.setFocusPainted(false);
+        startAppButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createRaisedBevelBorder(),
+                BorderFactory.createEmptyBorder(8, 30, 8, 30)
+        ));
+        startAppButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                startAppButton.setBackground(new Color(0, 56, 133));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                startAppButton.setBackground(new Color(0, 76, 153));
+            }
         });
-        developerInfoPanel.add(startAppButton);
+        startAppButton.addActionListener(e -> {
+            remove(developerInfoPanel);
+            createUI();
+        });
+        buttonPanel.add(startAppButton);
+
+        developerInfoPanel.add(logoPanel, BorderLayout.NORTH);
+        developerInfoPanel.add(infoPanel, BorderLayout.CENTER);
+        developerInfoPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(developerInfoPanel);
-        revalidate(); // Actualizar la interfaz
-        repaint(); // Redibujar la interfaz
+        revalidate();
+        repaint();
+    }
+
+    private void addInfoLine(JPanel panel, GridBagConstraints gbc, String text) {
+        JLabel label = new JLabel(text);
+        if (text.startsWith("•") || text.equals(" ")) {
+            label.setFont(new Font("Arial", Font.PLAIN, 13));
+        } else {
+            label.setFont(new Font("Arial", Font.BOLD, 13));
+        }
+        panel.add(label, gbc);
     }
 
     private void createUI() {
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Panel de búsqueda
         JPanel searchPanel = new JPanel(new GridLayout(2, 4, 5, 5));
         searchPanel.setBorder(BorderFactory.createTitledBorder("Opciones de Búsqueda"));
 
         JComboBox<String> searchType = new JComboBox<>(new String[]{
-                "Todas las Películas", "Películas por Cine", "Películas por Título", 
-                "Películas por Género", "Películas por Clasificación", "Películas Animadas"
+            "Todas las Películas", "Películas por Cine", "Películas por Título",
+            "Películas por Género", "Películas por Clasificación", "Películas Animadas"
         });
         JTextField searchField = new JTextField();
         JButton searchButton = new JButton("Buscar");
         JButton showAllButton = new JButton("Mostrar Todos los Cines");
         JButton addCinemaButton = new JButton("Agregar Cine");
-        JButton addMovieButton = new JButton("Agregar Película"); // Nuevo botón para agregar película
+        JButton addMovieButton = new JButton("Agregar Película");
 
         searchPanel.add(new JLabel("Tipo de Búsqueda:"));
         searchPanel.add(searchType);
@@ -163,16 +362,14 @@ public class CinemaInformationSystem extends JFrame {
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
         searchPanel.add(showAllButton);
-        searchPanel.add(addCinemaButton); // Agregar botón para agregar cine
-        searchPanel.add(addMovieButton); // Agregar botón para agregar película
+        searchPanel.add(addCinemaButton);
+        searchPanel.add(addMovieButton);
 
-        // Tabla de resultados
         tableModel = new DefaultTableModel(new Object[]{"Cine", "Película", "Género", "Clasificación", "Horarios", "Precios"}, 0);
         resultTable = new JTable(tableModel);
         resultTable.setRowHeight(25);
         JScrollPane tableScrollPane = new JScrollPane(resultTable);
 
-        // Panel de botones
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton saveButton = new JButton("Guardar Datos");
         JButton exitButton = new JButton("Salir");
@@ -180,12 +377,10 @@ public class CinemaInformationSystem extends JFrame {
         buttonPanel.add(saveButton);
         buttonPanel.add(exitButton);
 
-        // Agregar componentes al panel principal
         mainPanel.add(searchPanel, BorderLayout.NORTH);
         mainPanel.add(tableScrollPane, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Agregar listeners de acción
         searchButton.addActionListener(e -> {
             String searchText = searchField.getText();
             String selectedSearch = (String) searchType.getSelectedItem();
@@ -194,9 +389,9 @@ public class CinemaInformationSystem extends JFrame {
 
         showAllButton.addActionListener(e -> controller.showAllCinemas());
 
-        addCinemaButton.addActionListener(e -> openAddCinemaDialog()); // Abrir diálogo para agregar cine
+        addCinemaButton.addActionListener(e -> openAddCinemaDialog());
 
-        addMovieButton.addActionListener(e -> openAddMovieDialog()); // Abrir diálogo para agregar película
+        addMovieButton.addActionListener(e -> openAddMovieDialog());
 
         saveButton.addActionListener(e -> saveDataToFile());
 
@@ -204,16 +399,29 @@ public class CinemaInformationSystem extends JFrame {
 
         add(mainPanel);
         controller = new CinemaController(cinemas, tableModel);
-        revalidate(); // Actualizar la interfaz
-        repaint(); // Redibujar la interfaz
+        revalidate();
+        repaint();
+    }
+
+    private boolean contieneCaracteresEspeciales(String texto) {
+        String regex = "^[a-zA-Z0-9 áéíóúÁÉÍÓÚñÑ.,:;¡!¿?\\-]+$";
+        return !texto.matches(regex);
+    }
+
+    private boolean esTelefonoValido(String telefono) {
+        String regex = "^[0-9\\-() ]+$";
+        return telefono.matches(regex);
+    }
+
+    private boolean esFormatoHoraValido(String hora) {
+        String regex = "^([01]?[0-9]|2[0-3]):[0-5][0-9]$";
+        return hora.trim().matches(regex);
     }
 
     private void openAddCinemaDialog() {
-        // Crear un diálogo para agregar un nuevo cine
         JDialog dialog = new JDialog(this, "Agregar Cine", true);
         dialog.setLayout(new GridLayout(0, 2));
 
-        // Campos para ingresar datos
         JTextField nameField = new JTextField();
         JTextField addressField = new JTextField();
         JTextField phoneField = new JTextField();
@@ -227,22 +435,35 @@ public class CinemaInformationSystem extends JFrame {
 
         JButton addButton = new JButton("Agregar");
         addButton.addActionListener(e -> {
-            // Lógica para agregar el cine
             String cinemaName = nameField.getText();
             String cinemaAddress = addressField.getText();
             String cinemaPhone = phoneField.getText();
 
-            // Crear objeto Cinema y agregar a la lista
+            if (cinemaName.isEmpty() || cinemaAddress.isEmpty() || cinemaPhone.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Todos los campos son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (contieneCaracteresEspeciales(cinemaName)) {
+                JOptionPane.showMessageDialog(dialog, "El nombre del cine contiene caracteres no permitidos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (contieneCaracteresEspeciales(cinemaAddress)) {
+                JOptionPane.showMessageDialog(dialog, "La dirección contiene caracteres no permitidos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!esTelefonoValido(cinemaPhone)) {
+                JOptionPane.showMessageDialog(dialog, "El teléfono solo puede contener números, guiones y paréntesis.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Cinema newCinema = new Cinema(cinemaName, cinemaAddress, cinemaPhone);
             cinemas.add(newCinema);
-
-            // Actualizar la tabla
             controller.showAllCinemas();
-
-            // Guardar el nuevo cine en el archivo
             saveDataToFile();
-
-            dialog.dispose(); // Cerrar el diálogo
+            dialog.dispose();
         });
 
         dialog.add(addButton);
@@ -252,11 +473,9 @@ public class CinemaInformationSystem extends JFrame {
     }
 
     private void openAddMovieDialog() {
-        // Crear un diálogo para agregar una nueva película
         JDialog dialog = new JDialog(this, "Agregar Película", true);
         dialog.setLayout(new GridLayout(0, 2));
 
-        // Campos para ingresar datos
         JTextField titleField = new JTextField();
         JTextField directorField = new JTextField();
         JTextField actorsField = new JTextField();
@@ -268,7 +487,6 @@ public class CinemaInformationSystem extends JFrame {
         JTextField studentPriceField = new JTextField();
         JTextField holidayPriceField = new JTextField();
 
-        // JComboBox para seleccionar el cine
         JComboBox<Cinema> cinemaComboBox = new JComboBox<>();
         for (Cinema cinema : cinemas) {
             cinemaComboBox.addItem(cinema);
@@ -286,7 +504,7 @@ public class CinemaInformationSystem extends JFrame {
         dialog.add(genreField);
         dialog.add(new JLabel("Clasificación:"));
         dialog.add(ratingField);
-        dialog.add(new JLabel("Horarios (separados por comas):"));
+        dialog.add(new JLabel("Horarios (HH:MM, separados por comas):"));
         dialog.add(showTimesField);
         dialog.add(new JLabel("Precio Estándar:"));
         dialog.add(standardPriceField);
@@ -299,38 +517,81 @@ public class CinemaInformationSystem extends JFrame {
 
         JButton addButton = new JButton("Agregar");
         addButton.addActionListener(e -> {
-            // Lógica para agregar la película
             String title = titleField.getText();
             String director = directorField.getText();
             String[] actors = actorsField.getText().split(",");
             String genre = genreField.getText();
             String rating = ratingField.getText();
             String[] showTimes = showTimesField.getText().split(",");
-            double standardPrice = Double.parseDouble(standardPriceField.getText());
-            double seniorPrice = Double.parseDouble(seniorPriceField.getText());
-            double studentPrice = Double.parseDouble(studentPriceField.getText());
-            double holidayPrice = Double.parseDouble(holidayPriceField.getText());
 
-            // Obtener el cine seleccionado
-            Cinema selectedCinema = (Cinema) cinemaComboBox.getSelectedItem();
-
-            // Crear objeto Movie y agregar a la lista del cine correspondiente
-            Movie newMovie = new Movie(title, director, List.of(actors), genre, rating);
-            Pricing pricing = new Pricing(standardPrice, seniorPrice, studentPrice, holidayPrice);
-            MovieSchedule newSchedule = new MovieSchedule(newMovie, List.of(showTimes), pricing);
-
-            // Agregar la película al cine seleccionado
-            if (selectedCinema != null) {
-                selectedCinema.addSchedule(newSchedule);
+            if (title.isEmpty() || director.isEmpty() || actorsField.getText().isEmpty()
+                    || genre.isEmpty() || rating.isEmpty() || showTimesField.getText().isEmpty()
+                    || standardPriceField.getText().isEmpty() || seniorPriceField.getText().isEmpty()
+                    || studentPriceField.getText().isEmpty() || holidayPriceField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Todos los campos son obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
-            // Actualizar la tabla
-            controller.showAllCinemas();
+            if (contieneCaracteresEspeciales(title)) {
+                JOptionPane.showMessageDialog(dialog, "El título contiene caracteres no permitidos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            // Guardar la nueva película en el archivo
-            saveDataToFile();
+            if (contieneCaracteresEspeciales(director)) {
+                JOptionPane.showMessageDialog(dialog, "El director contiene caracteres no permitidos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            dialog.dispose(); // Cerrar el diálogo
+            for (String actor : actors) {
+                if (contieneCaracteresEspeciales(actor.trim())) {
+                    JOptionPane.showMessageDialog(dialog, "Los actores contienen caracteres no permitidos.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
+            if (contieneCaracteresEspeciales(genre)) {
+                JOptionPane.showMessageDialog(dialog, "El género contiene caracteres no permitidos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (contieneCaracteresEspeciales(rating)) {
+                JOptionPane.showMessageDialog(dialog, "La clasificación contiene caracteres no permitidos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            for (String time : showTimes) {
+                if (!esFormatoHoraValido(time.trim())) {
+                    JOptionPane.showMessageDialog(dialog, "Formato de hora inválido. Use HH:MM (24 horas).", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
+            try {
+                double standardPrice = Double.parseDouble(standardPriceField.getText());
+                double seniorPrice = Double.parseDouble(seniorPriceField.getText());
+                double studentPrice = Double.parseDouble(studentPriceField.getText());
+                double holidayPrice = Double.parseDouble(holidayPriceField.getText());
+
+                if (standardPrice <= 0 || seniorPrice <= 0 || studentPrice <= 0 || holidayPrice <= 0) {
+                    JOptionPane.showMessageDialog(dialog, "Los precios deben ser mayores que cero.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Cinema selectedCinema = (Cinema) cinemaComboBox.getSelectedItem();
+                Movie newMovie = new Movie(title, director, List.of(actors), genre, rating);
+                Pricing pricing = new Pricing(standardPrice, seniorPrice, studentPrice, holidayPrice);
+                MovieSchedule newSchedule = new MovieSchedule(newMovie, List.of(showTimes), pricing);
+
+                if (selectedCinema != null) {
+                    selectedCinema.addSchedule(newSchedule);
+                }
+
+                controller.showAllCinemas();
+                saveDataToFile();
+                dialog.dispose();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Por favor, ingrese precios válidos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         dialog.add(addButton);
@@ -386,7 +647,7 @@ public class CinemaInformationSystem extends JFrame {
                 }
             }
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar datos: " + e.getMessage(), 
+            JOptionPane.showMessageDialog(this, "Error al cargar datos: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
             createSampleData();
         }
@@ -395,35 +656,34 @@ public class CinemaInformationSystem extends JFrame {
     private void saveDataToFile() {
         try (PrintWriter writer = new PrintWriter(new FileWriter("cinema_data.txt"))) {
             for (Cinema cinema : cinemas) {
-                writer.println("Cinema:" + cinema.getName() + " | " + 
-                        cinema.getAddress() + " | " + cinema.getPhone());
+                writer.println("Cinema:" + cinema.getName() + " | "
+                        + cinema.getAddress() + " | " + cinema.getPhone());
 
                 for (MovieSchedule schedule : cinema.getSchedules()) {
                     Movie movie = schedule.getMovie();
-                    writer.println("Movie:" + movie.getName() + " | " + 
-                            movie.getDirector() + " | " + 
-                            String.join(", ", movie.getActors()) + " | " + 
-                            movie.getGenre() + " | " + 
-                            movie.getRating() + " | " + 
-                            String.join(", ", schedule.getShowTimes()) + " | " + 
-                            schedule.getPricing().getStandardPrice() + " | " + 
-                            schedule.getPricing().getSeniorPrice() + " | " + 
-                            schedule.getPricing().getStudentPrice() + " | " + 
-                            schedule.getPricing().getHolidayPrice());
+                    writer.println("Movie:" + movie.getName() + " | "
+                            + movie.getDirector() + " | "
+                            + String.join(", ", movie.getActors()) + " | "
+                            + movie.getGenre() + " | "
+                            + movie.getRating() + " | "
+                            + String.join(", ", schedule.getShowTimes()) + " | "
+                            + schedule.getPricing().getStandardPrice() + " | "
+                            + schedule.getPricing().getSeniorPrice() + " | "
+                            + schedule.getPricing().getStudentPrice() + " | "
+                            + schedule.getPricing().getHolidayPrice());
                 }
             }
-            JOptionPane.showMessageDialog(this, "¡Datos guardados exitosamente!", 
+            JOptionPane.showMessageDialog(this, "¡Datos guardados exitosamente!",
                     "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al guardar datos: " + e.getMessage(), 
+            JOptionPane.showMessageDialog(this, "Error al guardar datos: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void createSampleData() {
-        // Cine de ejemplo 1
         Cinema cinema1 = new Cinema("Cineplex Centro", "123 Calle Principal", "555-0101");
-        
+
         List<String> actors1 = List.of("Tom Hanks", "Emma Watson", "John Doe");
         Movie movie1 = new Movie("La Gran Aventura", "Steven Spielberg", actors1, "Aventura", "PG-13");
         Pricing pricing1 = new Pricing(12.50, 8.50, 9.50, 15.00);
@@ -442,9 +702,8 @@ public class CinemaInformationSystem extends JFrame {
         MovieSchedule schedule3 = new MovieSchedule(movie3, List.of("09:30", "12:00", "15:30"), pricing3);
         cinema1.addSchedule(schedule3);
 
-        // Cine de ejemplo 2
         Cinema cinema2 = new Cinema("Teatro Starlight", "456 Avenida Elm", "555-0202");
-        
+
         List<String> actors4 = List.of("Robert Downey Jr.", "Scarlett Johansson", "Mark Ruffalo");
         Movie movie4 = new Movie("Superhéroes Unidos", "Joss Whedon", actors4, "Acción", "PG-13");
         Pricing pricing4 = new Pricing(14.00, 9.50, 10.50, 17.00);
@@ -474,7 +733,7 @@ public class CinemaInformationSystem extends JFrame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
+
             CinemaInformationSystem app = new CinemaInformationSystem();
             app.setVisible(true);
         });
